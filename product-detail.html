@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Produk - MPK Store</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+            -webkit-appearance: none; margin: 0;
+        }
+        input[type=number] { 
+            appearance: textfield;
+            -moz-appearance: textfield; 
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .glass { background: rgba(20, 20, 20, 0.7); backdrop-filter: blur(10px); }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-dp { animation: fadeIn 0.3s ease-out forwards; }
+    </style>
+</head>
+<body class="bg-[#050505] text-white overflow-x-hidden">
+
+    <nav class="p-6 flex justify-between items-center sticky top-0 z-50 bg-[#050505]/80 backdrop-blur-xl border-b border-white/5">
+        <a href="index.html" class="flex items-center gap-2 text-zinc-500 hover:text-white transition">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+            <span class="text-[10px] font-black uppercase tracking-[0.3em]">Back</span>
+        </a>
+        <h1 class="text-xs font-black italic tracking-tighter">MPK <span class="text-red-600">STORE</span></h1>
+        <div class="w-10"></div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-6 py-12">
+        <div class="flex flex-col md:flex-row gap-16">
+            <div class="w-full md:w-7/12">
+                <div class="glass overflow-hidden rounded-[2.5rem] border border-white/5 shadow-2xl">
+                    <img id="main-product-img" src="" class="w-full h-auto object-cover hover:scale-105 transition duration-1000">
+                </div>
+            </div>
+
+            <div class="w-full md:w-5/12 space-y-8">
+                <div>
+                    <p id="product-badge" class="text-red-600 text-[10px] font-black uppercase tracking-[0.5em] mb-2">CATEGORY</p>
+                    <h2 id="product-name" class="text-5xl font-bold tracking-tighter uppercase italic leading-[0.9]">...</h2>
+                    <p id="product-price" class="text-2xl font-light text-zinc-400 mt-4">Rp 0</p>
+                </div>
+
+                <div class="space-y-4">
+                    <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest border-b border-white/10 pb-2">Deskripsi Produk</p>
+                    <p id="product-desc" class="text-sm text-zinc-400 leading-relaxed font-medium italic">...</p>
+                </div>
+
+                <div id="size-area" class="space-y-4">
+                    <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Pilih Ukuran <span class="text-red-600">*</span></p>
+                    <div class="flex gap-3">
+                        <button onclick="selectSize(this)" class="size-btn w-12 h-12 rounded-xl border border-white/10 flex items-center justify-center text-xs hover:border-red-600 transition">S</button>
+                        <button onclick="selectSize(this)" class="size-btn w-12 h-12 rounded-xl border border-white/10 flex items-center justify-center text-xs hover:border-red-600 transition">M</button>
+                        <button onclick="selectSize(this)" class="size-btn w-12 h-12 rounded-xl border border-white/10 flex items-center justify-center text-xs hover:border-red-600 transition">L</button>
+                        <button onclick="selectSize(this)" class="size-btn w-12 h-12 rounded-xl border border-white/10 flex items-center justify-center text-xs hover:border-red-600 transition">XL</button>
+                    </div>
+                </div>
+
+                <div class="pt-6">
+                    <button id="btn-open-checkout" onclick="openCheckoutModal()" class="w-full py-5 bg-white text-black font-black uppercase tracking-[0.2em] italic rounded-2xl hover:bg-red-600 hover:text-white transition-all duration-500 shadow-xl active:scale-95 flex items-center justify-center gap-2">
+                        <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+                        Add to Cart / Pesan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="checkoutModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="closeCheckoutModal()"></div>
+        <div class="glass border border-white/10 p-8 rounded-[2.5rem] max-w-md w-full relative z-10 max-h-[90vh] overflow-y-auto hide-scrollbar">
+            <h3 class="text-2xl font-bold mb-6 italic uppercase tracking-tighter text-white text-center">Data Pesanan</h3>
+            
+            <form id="order-form-final" class="space-y-4 text-left">
+                <input type="hidden" id="final-produk" name="produk">
+                <input type="hidden" id="final-ukuran" name="ukuran">
+                <input type="hidden" id="final-total" name="total_bayar">
+                <input type="hidden" id="final-koordinat" name="koordinat_pembeli">
+                
+                <div>
+                    <label class="text-[10px] font-bold text-zinc-500 uppercase ml-1">Nama Lengkap</label>
+                    <input type="text" name="nama" required class="w-full p-4 bg-zinc-900 border border-white/10 rounded-xl mt-1 outline-none focus:border-red-600 text-white text-sm" placeholder="Contoh: Andi MPK">
+                </div>
+
+                <div>
+                    <label class="text-[10px] font-bold text-zinc-500 uppercase ml-1">WhatsApp</label>
+                    <input type="tel" name="whatsapp" required class="w-full p-4 bg-zinc-900 border border-white/10 rounded-xl mt-1 outline-none focus:border-red-600 text-white text-sm" placeholder="08123456789">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[10px] font-bold text-zinc-500 uppercase ml-1">Asal Sekolah</label>
+                        <select id="asal-sekolah" name="sekolah" onchange="hitungTotal()" required class="w-full p-4 bg-zinc-900 border border-white/10 rounded-xl mt-1 outline-none focus:border-red-600 text-white text-[11px]">
+                            <option value="MAN Bandung Barat" data-ongkir="0">MAN Bandung Barat</option>
+                            <option value="SMAN 1 Cililin" data-ongkir="5000">SMAN 1 Cililin</option>
+                            <option value="SMK Bina Karya" data-ongkir="7000">SMK Bina Karya</option>
+                            <option value="Sekolah Lain" data-ongkir="10000">Sekolah Lain</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-zinc-500 uppercase ml-1">Jumlah</label>
+                        <input type="number" id="jumlah-beli" name="jumlah" value="1" min="1" oninput="hitungTotal()" required class="w-full p-4 bg-zinc-900 border border-white/10 rounded-xl mt-1 outline-none focus:border-red-600 text-white text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-[10px] font-bold text-zinc-500 uppercase ml-1">Metode Penerimaan</label>
+                    <select id="metode-kirim" name="metode" onchange="hitungTotal()" class="w-full p-4 bg-zinc-900 border border-white/10 rounded-xl mt-1 outline-none focus:border-red-600 text-white text-sm">
+                        <option value="Ambil di Basecamp">Ambil di Basecamp MPK</option>
+                        <option value="Kirim ke Lokasi">Kirim ke Lokasi (Kurir)</option>
+                    </select>
+                </div>
+
+                <div id="dp-notice" class="hidden p-3 bg-red-600/20 border border-red-600/50 rounded-xl animate-dp">
+                    <p class="text-[10px] text-red-400 font-bold uppercase italic">⚠️ WAJIB DP</p>
+                    <p class="text-[9px] text-zinc-400 leading-tight">Pesanan di atas 3 pcs wajib membayar DP minimal 50% untuk diproses.</p>
+                </div>
+
+                <div class="p-4 bg-white/5 rounded-2xl space-y-2 border border-white/5 mt-4">
+                    <div class="flex justify-between text-xs text-zinc-400">
+                        <span>Harga</span>
+                        <span id="label-harga">Rp0</span>
+                    </div>
+                    <div class="flex justify-between text-xs text-zinc-400">
+                        <span>Ongkir</span>
+                        <span id="label-ongkir">Rp0</span>
+                    </div>
+                    <div class="flex justify-between text-sm font-bold text-white pt-2 border-t border-white/10">
+                        <span>Total Bayar</span>
+                        <span id="label-total" class="text-red-500">Rp0</span>
+                    </div>
+                </div>
+
+                <button type="submit" id="btn-submit" class="w-full py-5 bg-red-600 text-white font-black uppercase italic rounded-2xl hover:bg-red-700 transition mt-2 shadow-lg">
+                    Konfirmasi & Kirim
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="successModal" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black backdrop-blur-xl"></div>
+        <div class="text-center relative z-10 space-y-6">
+            <div class="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center mx-auto shadow-[0_0_40px_rgba(220,38,38,0.5)]">
+                <i data-lucide="check" class="text-white w-10 h-10"></i>
+            </div>
+            <h2 class="text-4xl font-black italic uppercase tracking-tighter">Berhasil!</h2>
+            <p id="success-message" class="text-zinc-400 max-w-xs mx-auto text-sm leading-relaxed italic">Data pesanan sudah masuk.</p>
+            <button onclick="window.location.href='index.html'" class="px-10 py-4 border border-white/20 rounded-full text-[10px] font-bold uppercase tracking-widest hover:bg-white hover:text-black transition">Kembali</button>
+        </div>
+    </div>
+
+    <script>
+    lucide.createIcons();
+    const params = new URLSearchParams(window.location.search);
+    let selectedSize = "";
+    const hargaSatuan = parseInt(params.get('price')) || 0;
+
+    // Masukkan Link Web App Google Script kamu di sini
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyzauvZ-utp6DUYb-PmAkebBqA7RAVMToUJ-FzsyBbhSIpOZCT9UcFcoy7kBPrBoDcRDg/exec';
+    function selectSize(btn) {
+        document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('border-red-600', 'bg-red-600/20', 'text-white'));
+        btn.classList.add('border-red-600', 'bg-red-600/20', 'text-white');
+        selectedSize = btn.innerText;
+    }
+
+    if(params.get('name')) {
+        document.getElementById('product-name').innerText = params.get('name');
+        document.getElementById('product-price').innerText = `Rp ${hargaSatuan.toLocaleString('id-ID')}`;
+        document.getElementById('main-product-img').src = params.get('img');
+        document.getElementById('product-desc').innerText = params.get('desc');
+        document.getElementById('product-badge').innerText = params.get('cat');
+        if(params.get('cat') === 'Makanan') document.getElementById('size-area').style.display = 'none';
+    }
+
+    function hitungTotal() {
+        const jumlah = parseInt(document.getElementById('jumlah-beli').value) || 1;
+        const selectSekolah = document.getElementById('asal-sekolah');
+        const metodeKirim = document.getElementById('metode-kirim').value;
+        
+        let ongkir = 0;
+        if (metodeKirim === "Kirim ke Lokasi") {
+            ongkir = parseInt(selectSekolah.options[selectSekolah.selectedIndex].getAttribute('data-ongkir')) || 0;
+        }
+
+        const totalHargaBarang = hargaSatuan * jumlah;
+        const totalSemua = totalHargaBarang + ongkir;
+
+        if (jumlah > 3) document.getElementById('dp-notice').classList.remove('hidden');
+        else document.getElementById('dp-notice').classList.add('hidden');
+
+        document.getElementById('label-harga').innerText = `Rp${totalHargaBarang.toLocaleString('id-ID')}`;
+        document.getElementById('label-ongkir').innerText = `Rp${ongkir.toLocaleString('id-ID')}`;
+        document.getElementById('label-total').innerText = `Rp${totalSemua.toLocaleString('id-ID')}`;
+        
+        // Pastikan input hidden ini terisi
+        document.getElementById('final-total').value = `Rp ${totalSemua.toLocaleString('id-ID')}`;
+    }
+
+    function openCheckoutModal() {
+        if(params.get('cat') !== 'Makanan' && selectedSize === "") {
+            alert("Wajib pilih ukuran (Size) terlebih dahulu!");
+            return;
+        }
+
+        const btn = document.getElementById('btn-open-checkout');
+        const originalText = btn.innerHTML;
+
+        if (navigator.geolocation) {
+            btn.innerText = "Mendeteksi Lokasi...";
+            btn.disabled = true;
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    
+                    // Masukkan koordinat ke form
+                    document.getElementById('final-koordinat').value = lat + ", " + lon;
+
+                    // Koordinat MAN Bandung Barat (Cililin)
+                    // Lat: -6.942, Lon: 107.452 (Sesuaikan jika kurang pas)
+                    const targetLat = -6.942851;
+                    const targetLon = 107.452145;
+                    
+                    const dist = Math.sqrt(Math.pow(lat - targetLat, 2) + Math.pow(lon - targetLon, 2));
+                    
+                    if(dist < 0.005) { // Radius sekitar 500 meter
+                        document.getElementById('asal-sekolah').value = "MAN Bandung Barat";
+                    }
+
+                    document.getElementById('final-produk').value = params.get('name');
+                    document.getElementById('final-ukuran').value = selectedSize || "N/A";
+                    
+                    document.getElementById('checkoutModal').classList.remove('hidden');
+                    hitungTotal();
+                    
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                },
+                (error) => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    alert("Gagal mendeteksi lokasi. Pastikan izin lokasi aktif dan gunakan HTTPS.");
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        } else {
+            alert("Browser tidak mendukung lokasi.");
+        }
+    }
+
+    function closeCheckoutModal() {
+        document.getElementById('checkoutModal').classList.add('hidden');
+    }
+
+    // SUBMIT DATA
+    document.getElementById('order-form-final').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('btn-submit');
+        btn.innerText = "Mengirim...";
+        btn.disabled = true;
+
+        fetch(scriptURL, { 
+            method: 'POST', 
+            body: new FormData(this),
+            mode: 'no-cors' // Tambahkan ini jika terjadi error CORS
+        })
+        .then(() => {
+            // Karena no-cors, kita anggap sukses jika tidak masuk ke catch
+            document.getElementById('checkoutModal').classList.add('hidden');
+            document.getElementById('successModal').classList.remove('hidden');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert("Terjadi kesalahan saat mengirim data.");
+            btn.innerText = "Konfirmasi & Kirim";
+            btn.disabled = false;
+        });
+    });
+</script>
+</body>
+</html>

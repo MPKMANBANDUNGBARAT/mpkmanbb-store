@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danus MPK Store | Marketplace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-[#050505] text-white">
+
+    <header class="header-sticky p-4 glass z-50">
+        <div class="max-w-6xl mx-auto flex flex-col gap-4">
+            <div class="flex items-center justify-between">
+                <h1 class="text-xl font-bold text-red-600 tracking-tighter">MPK<span class="text-white text-sm font-light ml-1">SHOP</span></h1>
+                <div class="flex gap-4 items-center">
+                    <i class="fa-solid fa-cart-shopping text-gray-400"></i>
+                    <i class="fa-solid fa-comment-dots text-gray-400"></i>
+                </div>
+            </div>
+            <div class="relative">
+                <input type="text" id="searchBar" placeholder="Cari merch MPK di sini..." class="w-full pl-10 pr-4 py-2 text-sm bg-white/5 border border-white/10 rounded-xl outline-none focus:border-red-600">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-500 text-xs"></i>
+            </div>
+        </div>
+    </header>
+
+    <section class="max-w-6xl mx-auto px-4 py-4 overflow-x-auto whitespace-nowrap hide-scrollbar">
+        <button class="category-pill active">Semua</button>
+        <button class="category-pill">Atasan</button>
+        <button class="category-pill">Aksesoris</button>
+        <button class="category-pill">Alat Tulis</button>
+        <button class="category-pill">Edisi Khusus</button>
+    </section>
+
+    <section id="banner-promo" class="max-w-6xl mx-auto px-4 mb-6">
+        <div class="glass h-32 w-full rounded-2xl flex items-center justify-center bg-gradient-to-r from-red-900/20 to-transparent border border-red-500/20">
+            <div class="text-center">
+                <p class="text-xs uppercase tracking-widest text-red-400 font-bold">Promo Spesial</p>
+                <h3 class="text-lg font-bold italic">Diskon 10% Member MPK</h3>
+            </div>
+        </div>
+    </section>
+
+    <main id="main-content" class="max-w-6xl mx-auto px-4 pb-20">
+        <div id="product-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
+            </div>
+    </main>
+
+    <section class="max-w-2xl mx-auto px-4 mb-20">
+        <div id="order-form-container" class="hidden glass p-6 rounded-[2rem] border border-white/10 shadow-2xl">
+            <div class="flex justify-between items-center mb-6 border-b border-white/5 pb-4">
+                <h3 class="text-xl font-bold italic uppercase tracking-tighter">Konfirmasi Pesanan</h3>
+                <button onclick="window.location.href='index.html'" class="text-zinc-500 hover:text-white transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form id="order-form" class="space-y-4">
+                <input type="hidden" id="item-name" name="produk">
+                <input type="hidden" id="item-size" name="ukuran">
+
+                <div>
+                    <label class="text-[10px] font-bold text-zinc-500 uppercase ml-2 tracking-widest">Nama Lengkap</label>
+                    <input type="text" name="nama" required placeholder="Masukkan nama kamu" class="w-full p-4 glass rounded-xl mt-1 outline-none focus:border-red-600 transition">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[10px] font-bold text-zinc-500 uppercase ml-2 tracking-widest">Kelas</label>
+                        <div class="relative">
+                            <select name="kelas" required class="w-full p-4 glass rounded-xl mt-1 outline-none focus:border-red-600 transition text-white appearance-none bg-zinc-900/50">
+                                <option value="" disabled selected>Pilih Kelas</option>
+                                <option value="X-1">X-1</option>
+                                <option value="X-2">X-2</option>
+                                <option value="XI-IPA 1">XI-IPA 1</option>
+                                <option value="XI-IPS 1">XI-IPS 1</option>
+                                <option value="XII-IPA 1">XII-IPA 1</option>
+                            </select>
+                            <div class="absolute right-4 top-5 pointer-events-none text-zinc-500">
+                                <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-zinc-500 uppercase ml-2 tracking-widest">No. WA</label>
+                        <input type="number" name="whatsapp" required placeholder="+62..." class="w-full p-4 glass rounded-xl mt-1 outline-none focus:border-red-600 transition">
+                    </div>
+                </div>
+
+                <button type="submit" id="submit-order" class="w-full py-5 bg-red-600 text-white font-black uppercase tracking-[0.2em] italic rounded-2xl hover:bg-red-700 transition active:scale-95 shadow-xl shadow-red-600/20 mt-4">
+                    KIRIM PESANAN
+                </button>
+            </form>
+        </div>
+
+        <div id="pickup-instruction" class="hidden glass p-8 rounded-[2rem] border border-green-500/30 text-center">
+            <div class="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-check text-green-500 text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-2 uppercase italic tracking-tighter">Pesanan Terkirim!</h3>
+            <p class="text-zinc-400 text-sm mb-6">Data sudah masuk ke sistem MPK. Silakan ambil barang di Basecamp saat jam istirahat.</p>
+            <button onclick="window.location.href='index.html'" class="text-xs font-bold text-red-500 uppercase tracking-widest hover:underline">Kembali ke Toko</button>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

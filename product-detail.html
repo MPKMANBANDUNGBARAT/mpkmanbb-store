@@ -167,15 +167,17 @@
     let selectedSize = "";
     const hargaSatuan = parseInt(params.get('price')) || 0;
 
-    // Masukkan Link Web App Google Script kamu yang baru di sini
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbyNcza0YwpntP7TOoxmyKSvmRFifqNUN5SgtHe8W_pyocjAq6gQPnQ6C_bHmRgyInfC/exec';
+    // 1. PASTIKAN LINK INI ADALAH URL DEPLOYMENT TERBARU DARI APPS SCRIPT
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyRU_Upfe1bIahMsYGeMN5Yde4HaNkGM25uZZxIgstk8yswKNHbyTFdDlvJoEkGnLQxtg/exec';
 
+    // Fungsi Pilih Ukuran
     function selectSize(btn) {
         document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('border-red-600', 'bg-red-600/20', 'text-white'));
         btn.classList.add('border-red-600', 'bg-red-600/20', 'text-white');
         selectedSize = btn.innerText;
     }
 
+    // Mengisi Detail Produk Otomatis dari URL
     if(params.get('name')) {
         document.getElementById('product-name').innerText = params.get('name');
         document.getElementById('product-price').innerText = `Rp ${hargaSatuan.toLocaleString('id-ID')}`;
@@ -185,6 +187,7 @@
         if(params.get('cat') === 'Makanan') document.getElementById('size-area').style.display = 'none';
     }
 
+    // Fungsi Hitung Total Harga & Ongkir
     function hitungTotal() {
         const jumlah = parseInt(document.getElementById('jumlah-beli').value) || 1;
         const selectSekolah = document.getElementById('asal-sekolah');
@@ -198,17 +201,20 @@
         const totalHargaBarang = hargaSatuan * jumlah;
         const totalSemua = totalHargaBarang + ongkir;
 
+        // Tampilkan Notif DP jika beli banyak
         if (jumlah > 3) document.getElementById('dp-notice').classList.remove('hidden');
         else document.getElementById('dp-notice').classList.add('hidden');
 
+        // Update Tampilan Label
         document.getElementById('label-harga').innerText = `Rp${totalHargaBarang.toLocaleString('id-ID')}`;
         document.getElementById('label-ongkir').innerText = `Rp${ongkir.toLocaleString('id-ID')}`;
         document.getElementById('label-total').innerText = `Rp${totalSemua.toLocaleString('id-ID')}`;
         
+        // Simpan ke input hidden untuk dikirim ke Google Sheet
         document.getElementById('final-total').value = `Rp ${totalSemua.toLocaleString('id-ID')}`;
     }
 
-    // --- FUNGSI MODIFIKASI: TIDAK MEMAKSA LOKASI ---
+    // Fungsi Buka Modal & Cek Lokasi (Opsional)
     function openCheckoutModal() {
         if(params.get('cat') !== 'Makanan' && selectedSize === "") {
             alert("Wajib pilih ukuran (Size) terlebih dahulu!");
@@ -218,11 +224,10 @@
         const btn = document.getElementById('btn-open-checkout');
         const originalText = btn.innerHTML;
 
-        // Siapkan data produk ke hidden input sebelum modal buka
+        // Set data produk dasar
         document.getElementById('final-produk').value = params.get('name');
         document.getElementById('final-ukuran').value = selectedSize || "N/A";
 
-        // Coba deteksi lokasi, tapi jangan cegah modal terbuka jika gagal
         if (navigator.geolocation) {
             btn.innerText = "Mendeteksi Lokasi...";
             btn.disabled = true;
@@ -233,19 +238,15 @@
                     const lon = position.coords.longitude;
                     document.getElementById('final-koordinat').value = lat + ", " + lon;
                     
-                    // Auto-select sekolah jika dekat MAN BB
+                    // Auto-detect jika pembeli ada di sekolah (MAN BB)
                     const targetLat = -6.942851;
                     const targetLon = 107.452145;
                     const dist = Math.sqrt(Math.pow(lat - targetLat, 2) + Math.pow(lon - targetLon, 2));
-                    if(dist < 0.005) {
-                        document.getElementById('asal-sekolah').value = "MAN Bandung Barat";
-                    }
+                    if(dist < 0.005) { document.getElementById('asal-sekolah').value = "MAN Bandung Barat"; }
                     
                     tampilkanModal();
                 },
                 (error) => {
-                    // Jika lokasi ditolak/gagal, tetap jalankan modal
-                    console.warn("Lokasi diabaikan/gagal.");
                     document.getElementById('final-koordinat').value = "Lokasi tidak diizinkan";
                     tampilkanModal();
                 },
@@ -268,26 +269,30 @@
         document.getElementById('checkoutModal').classList.add('hidden');
     }
 
-    // SUBMIT DATA KE GOOGLE SHEETS
+    // --- LOGIKA PENGIRIMAN (DISAMAKAN DENGAN SISTEM ASPIRASI) ---
     document.getElementById('order-form-final').addEventListener('submit', function(e) {
         e.preventDefault();
         const btn = document.getElementById('btn-submit');
+        
         btn.innerText = "Mengirim...";
         btn.disabled = true;
 
+        // Mengambil data form menggunakan FormData (sama seperti aspirasi)
+        const formData = new FormData(this);
+
         fetch(scriptURL, { 
             method: 'POST', 
-            body: new FormData(this),
-            mode: 'no-cors' 
+            body: formData,
+            mode: 'no-cors' // Penting agar tidak kena blokir GitHub/CORS
         })
         .then(() => {
-            // Berhasil
+            // Karena menggunakan no-cors, kita langsung anggap sukses
             document.getElementById('checkoutModal').classList.add('hidden');
             document.getElementById('successModal').classList.remove('hidden');
         })
         .catch(error => {
             console.error('Error:', error);
-            alert("Terjadi kesalahan saat mengirim data.");
+            alert("Gagal mengirim data. Pastikan internet aktif.");
             btn.innerText = "Konfirmasi & Kirim";
             btn.disabled = false;
         });
@@ -296,6 +301,7 @@
 </body>
 
 </html>
+
 
 
 

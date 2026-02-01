@@ -167,8 +167,9 @@
     let selectedSize = "";
     const hargaSatuan = parseInt(params.get('price')) || 0;
 
-    // Masukkan Link Web App Google Script kamu di sini
+    // Masukkan Link Web App Google Script kamu yang baru di sini
     const scriptURL = 'https://script.google.com/macros/s/AKfycbxwyvwO8BzE87lFLbpMlS2Ycn6TUhM8FGeuS0WBQKb_a4bzOpQLjyL5t8HhLpXyKdV_0Q/exec';
+
     function selectSize(btn) {
         document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('border-red-600', 'bg-red-600/20', 'text-white'));
         btn.classList.add('border-red-600', 'bg-red-600/20', 'text-white');
@@ -204,10 +205,10 @@
         document.getElementById('label-ongkir').innerText = `Rp${ongkir.toLocaleString('id-ID')}`;
         document.getElementById('label-total').innerText = `Rp${totalSemua.toLocaleString('id-ID')}`;
         
-        // Pastikan input hidden ini terisi
         document.getElementById('final-total').value = `Rp ${totalSemua.toLocaleString('id-ID')}`;
     }
 
+    // --- FUNGSI MODIFIKASI: TIDAK MEMAKSA LOKASI ---
     function openCheckoutModal() {
         if(params.get('cat') !== 'Makanan' && selectedSize === "") {
             alert("Wajib pilih ukuran (Size) terlebih dahulu!");
@@ -217,6 +218,11 @@
         const btn = document.getElementById('btn-open-checkout');
         const originalText = btn.innerHTML;
 
+        // Siapkan data produk ke hidden input sebelum modal buka
+        document.getElementById('final-produk').value = params.get('name');
+        document.getElementById('final-ukuran').value = selectedSize || "N/A";
+
+        // Coba deteksi lokasi, tapi jangan cegah modal terbuka jika gagal
         if (navigator.geolocation) {
             btn.innerText = "Mendeteksi Lokasi...";
             btn.disabled = true;
@@ -225,39 +231,36 @@
                 (position) => {
                     const lat = position.coords.latitude;
                     const lon = position.coords.longitude;
-                    
-                    // Masukkan koordinat ke form
                     document.getElementById('final-koordinat').value = lat + ", " + lon;
-
-                    // Koordinat MAN Bandung Barat (Cililin)
-                    // Lat: -6.942, Lon: 107.452 (Sesuaikan jika kurang pas)
+                    
+                    // Auto-select sekolah jika dekat MAN BB
                     const targetLat = -6.942851;
                     const targetLon = 107.452145;
-                    
                     const dist = Math.sqrt(Math.pow(lat - targetLat, 2) + Math.pow(lon - targetLon, 2));
-                    
-                    if(dist < 0.005) { // Radius sekitar 500 meter
+                    if(dist < 0.005) {
                         document.getElementById('asal-sekolah').value = "MAN Bandung Barat";
                     }
-
-                    document.getElementById('final-produk').value = params.get('name');
-                    document.getElementById('final-ukuran').value = selectedSize || "N/A";
                     
-                    document.getElementById('checkoutModal').classList.remove('hidden');
-                    hitungTotal();
-                    
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
+                    tampilkanModal();
                 },
                 (error) => {
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                    alert("Gagal mendeteksi lokasi. Pastikan izin lokasi aktif dan gunakan HTTPS.");
+                    // Jika lokasi ditolak/gagal, tetap jalankan modal
+                    console.warn("Lokasi diabaikan/gagal.");
+                    document.getElementById('final-koordinat').value = "Lokasi tidak diizinkan";
+                    tampilkanModal();
                 },
-                { enableHighAccuracy: true, timeout: 10000 }
+                { enableHighAccuracy: true, timeout: 5000 }
             );
         } else {
-            alert("Browser tidak mendukung lokasi.");
+            document.getElementById('final-koordinat').value = "Tidak didukung browser";
+            tampilkanModal();
+        }
+
+        function tampilkanModal() {
+            document.getElementById('checkoutModal').classList.remove('hidden');
+            hitungTotal();
+            btn.innerHTML = originalText;
+            btn.disabled = false;
         }
     }
 
@@ -265,7 +268,7 @@
         document.getElementById('checkoutModal').classList.add('hidden');
     }
 
-    // SUBMIT DATA
+    // SUBMIT DATA KE GOOGLE SHEETS
     document.getElementById('order-form-final').addEventListener('submit', function(e) {
         e.preventDefault();
         const btn = document.getElementById('btn-submit');
@@ -275,10 +278,10 @@
         fetch(scriptURL, { 
             method: 'POST', 
             body: new FormData(this),
-            mode: 'no-cors' // Tambahkan ini jika terjadi error CORS
+            mode: 'no-cors' 
         })
         .then(() => {
-            // Karena no-cors, kita anggap sukses jika tidak masuk ke catch
+            // Berhasil
             document.getElementById('checkoutModal').classList.add('hidden');
             document.getElementById('successModal').classList.remove('hidden');
         })
@@ -293,3 +296,4 @@
 </body>
 
 </html>
+
